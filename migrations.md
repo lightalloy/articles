@@ -71,7 +71,7 @@ end
 
 Передавать поля не обязательно, также вы сможете отредактировать файл после создания.  
 
-Посмотрим ещё пару примеров миграций:
+Пример миграции для создания таблицы:
 
 ```ruby
 # эта миграция создаст таблицу products
@@ -86,24 +86,26 @@ class CreateProducts < ActiveRecord::Migration[8.0]
   end
 end
 ```
-или  
-
-```ruby
-# эта миграция добавит поле к таблице products и индекс на это поле
-
-class AddPartNumberToProducts < ActiveRecord::Migration[8.0]
-  def change
-    add_column :products, :part_number, :string
-    add_index :products, :part_number
-  end
-end
-```
 
 `timestamps` добавит 2 колонки: `created_at` и `updated_at`. Это специальные колонки, в которых будут храниться время и дата создания и обновления записи. Записывать в них данные в коде приложения не нужно, Active Record будет делать это автоматически.
 
 `ActiveRecord::Migration[8.0]` - в квадратных скобках указана версия фреймворка,  с помощью которой была создана миграция. Бгагодаря такому версионированию, после апгрейда Rails старые миграции продолжат работать, даже если были изменения в механизме миграций
 
-[Подробнее о реализации версионирования в коде rails](https://github.com/rails/rails/blob/65014e2379546e25407e87e5b3a056e0460361c7/activerecord/lib/active_record/migration/compatibility.rb#L16-L31)
+[Подробнее о версионировании миграций в коде rails](https://github.com/rails/rails/blob/65014e2379546e25407e87e5b3a056e0460361c7/activerecord/lib/active_record/migration/compatibility.rb#L16-L31)
+
+Пример миграции для изменения таблицы:
+
+```ruby
+# эта миграция добавит поле к таблице products и индекс на это поле
+# db/migrate/20240502100843_add_part_number_to_products.rb
+class AddPartNumberToProducts < ActiveRecord::Migration[8.0]
+  def change
+    add_column :products, :part_number, :string
+    # индекс сделает запросы с поиском по part_number быстрее
+    add_index :products, :part_number
+  end
+end
+```
 
 ### Применяем изменения
 
@@ -160,7 +162,7 @@ end
 Лучше сделать это в дата-миграциях, такие миграции позволят нам логически отделить изменения структуры от изменения данных в приложении.
 Для миграций данных существуют специальные гемы: [maintenance_tasks](https://github.com/Shopify/maintenance_tasks), [data-migrate](https://github.com/ilyakatz/data-migrate)
 
-Также не стоит использовать в миграциях  модели и другой код приложения -- со временем код изменится, модели и методы будут изменены или удалены, тогда миграции перестанут работать.
+Также не стоит использовать в миграциях  модели и другой код приложения — со временем код изменится, модели и методы будут изменены или удалены, тогда миграции перестанут работать.
 
 ### Вывод
 
